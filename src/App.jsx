@@ -6,6 +6,7 @@ function App() {
     author: "Kevin Kruse"
   });
   const [color, setColor] = useState('#87CEEB');
+  const [showCopyMessage, setShowCopyMessage] = useState(false);
 
   const quotes = [
     { text: "Life isn't about getting and having, it's about giving and being.", author: "Kevin Kruse"},
@@ -43,44 +44,65 @@ function App() {
     document.body.style.color = colors[randomColor];
   };
 
+  const copyQuote = async () => {
+    try {
+      await navigator.clipboard.writeText(`"${quote.text}" - ${quote.author}`);
+      setShowCopyMessage(true);
+      setTimeout(() => setShowCopyMessage(false), 2000);
+    } catch (err) {
+      console.error('Failed to copy text: ', err);
+    }
+  };
+
   useEffect(() => {
     document.body.style.backgroundColor = color;
     document.body.style.color = color;
   }, []);
 
-  const tweetQuote = () => {
-    const tweetText = encodeURIComponent(`"${quote.text}" - ${quote.author}`);
-    window.open(`https://twitter.com/intent/tweet?text=${tweetText}`, '_blank');
-  };
-
   return (
-    <div id="quote-box">
-      <div className="quote-text">
-        <i className="fa fa-quote-left"> </i>
-        <span id="text"> {quote.text}</span>
-      </div>
-      <div className="quote-author">
-        - <span id="author">{quote.author}</span>
-      </div>
-      <div className="buttons">
-        <a
-          id="tweet-quote"
-          href={`https://twitter.com/intent/tweet?text=${encodeURIComponent('"' + quote.text + '" ' + quote.author)}`}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="button"
-          style={{ backgroundColor: color }}
-        >
-          <i className="fab fa-twitter"></i>
-        </a>
-        <button
-          id="new-quote"
-          onClick={getRandomQuote}
-          className="button"
-          style={{ backgroundColor: color }}
-        >
-          New quote
-        </button>
+    <div className="container">
+      <h1>Random Quote Generator</h1>
+      <div id="quote-box">
+        <div className="quote-text">
+          <div className={`copy-success ${showCopyMessage ? 'show' : ''}`}>
+            Copied to clipboard!
+          </div>
+          <i className="fa fa-quote-left"> </i>
+          <span id="text"> {quote.text}</span>
+        </div>
+        <div className="quote-author">
+          - <span id="author">{quote.author}</span>
+        </div>
+        <div className="buttons">
+          <div>
+            <a
+              id="tweet-quote"
+              href={`https://twitter.com/intent/tweet?text=${encodeURIComponent('"' + quote.text + '" ' + quote.author)}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="button"
+              style={{ backgroundColor: color }}
+            >
+              <i className="fab fa-twitter"></i>
+            </a>
+            <button
+              id="copy-quote"
+              onClick={copyQuote}
+              className="button"
+              style={{ backgroundColor: color }}
+            >
+              <i className="far fa-copy"></i>
+            </button>
+          </div>
+          <button
+            id="new-quote"
+            onClick={getRandomQuote}
+            className="button"
+            style={{ backgroundColor: color }}
+          >
+            New quote
+          </button>
+        </div>
       </div>
     </div>
   );
